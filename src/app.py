@@ -63,6 +63,49 @@ def registro_alumnos():
             return jsonify({'mensaje':'Alumno agregado','exito':True})
     except Exception as ex:
         return jsonify({"message": "Error al conectar a la base de datos {}".format(ex),'exito':False})
+    
+@app.route('/alumnos/<mat>', methods=['GET'])
+def leer_curso(mat):
+    try:
+        alumno = leer_alumno_bd(mat)
+        if alumno != None:
+            return jsonify({'alumno': alumno, 'mensaje': "Alumno encontrado.", 'exito': True})
+        else:
+            return jsonify({'mensaje': "Alumno no encontrado.", 'exito': False})
+    except Exception as ex:
+        return jsonify({'mensaje': "Error", 'exito': False})
+
+@app.route('/alumnos/<mat>', methods=['PUT'])
+def actualizar_curso(mat):
+    #if (validar_matricula(mat) and validar_nombre(request.json['nombre']) and validar_apaterno(request.json['apaterno'])):
+        try:
+            alumno = leer_alumno_bd(mat)
+            if alumno != None:
+                cursor = con.connection.cursor()
+                sql = """UPDATE alumnos SET nombre = '{0}', apaterno = '{1}', amaterno='{2}', correo='{3}'
+                WHERE matricula = {4}""".format(request.json['nombre'], request.json['apaterno'], request.json['amaterno'],request.json['correo'], mat)
+                cursor.execute(sql)
+                con.connection.commit()  # Confirma la acción de actualización.
+                return jsonify({'mensaje': "Alumno actualizado.", 'exito': True})
+            else:
+                return jsonify({'mensaje': "Alumno no encontrado.", 'exito': False})
+        except Exception as ex:
+            return jsonify({'mensaje': "Error {0} ".format(ex), 'exito': False})
+        
+@app.route('/alumnos/<mat>', methods=['DELETE'])
+def eliminar_curso(mat):
+    try:
+        alumno = leer_alumno_bd(mat)
+        if alumno != None:
+            cursor = con.connection.cursor()
+            sql = "DELETE FROM alumnos WHERE matricula = {0}".format(mat)
+            cursor.execute(sql)
+            con.connection.commit()  # Confirma la acción de eliminación.
+            return jsonify({'mensaje': "Alumno eliminado.", 'exito': True})
+        else:
+            return jsonify({'mensaje': "Alumno no encontrado.", 'exito': False})
+    except Exception as ex:
+        return jsonify({'mensaje': "Error", 'exito': False})
  
  
 def pagina_no_encontrada(error):
