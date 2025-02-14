@@ -1,12 +1,16 @@
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
- 
+from flask_cors import CORS, cross_origin 
+
  
  
 from config import config
+#from validaciones import *
  
 app=Flask(__name__)
  
+CORS(app)
+
 con=MySQL(app)
  
 @app.route("/alumnos",methods=['GET'])
